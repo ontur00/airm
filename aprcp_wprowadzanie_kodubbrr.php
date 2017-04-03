@@ -1,0 +1,124 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+<HEAD>
+<TITLE>przetwarzanie danych czytnik</TITLE>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-2">
+
+<?php
+$tekst_1="Ostatnie zdarzenie / Last Event:";
+$lok_baza="";
+session_start();
+$login=$_SESSION['luzytkownik'];
+$dluglogin = strlen($login);
+$kod 	= $_POST['kodm'];
+$_SESSION['sbarcode']=$kod;
+
+
+ if($dluglogin<2){ echo "<font size='0'>"; echo include "wyloguj.php"; 
+$komunikat = "<center><B><font size='1'><FONT COLOR='#FF0000'>Zaloguj ponownie<BR>. 
+             ";
+echo "<font size='0'>$komunikat"; 
+		 }
+elseif ($kod==="..."){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbr.php"; 
+					$komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'> Wczytaj Kod<B> Produktu BOX </b></center></b><hr>";
+																	echo $komunikat;}		 
+elseif ($kod===".."){ echo "<font size='0'>"; echo include "aprcp_wprowadzanie_kodubbr.php"; 
+					$komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'> Wczytaj Kod<B> Z PUDELKA  </b> - MIGRACJA PUDELKA DO PALETY/LOKALIZACJI</center></b><hr>";
+																	echo $komunikat;}		 
+elseif ($kod==="."){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrp.php"; 
+					$komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'> Wczytaj Kod<B> P A L E T Y  </b> aby miecić na Regale</center></b><hr>";
+																	echo $komunikat;}
+elseif ($kod==="0"){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrpz.php"; 
+					$komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'> Wczytaj Kod<B> P A L E T Y  </b> aby zdjac z Regalu</center></b><hr>";
+																	echo $komunikat;}
+else {																	
+																
+
+      $dlug = strlen($kod);
+      $data_rok = substr($kod, 0,4);
+      $data_mies = substr($kod, 4,2);
+      $data_dzien = substr($kod, 6,2);
+      $data_exp="$data_rok-$data_mies-$data_dzien";
+      $dlug_kor=$dlug-18;
+
+      $shinchang_part_no = substr($kod, 8,$dlug_kor);
+
+
+
+      $qty_box_st        = $dlug-9;
+      $qty_box_end       = $dlug-4;
+      $qty_box_rob       = substr($kod, $qty_box_st,$qty_box_end);
+      $qty_box		   	 = substr($qty_box_rob ,0,5);
+      $qty_box_il		 = substr(str_replace("O", "", $qty_box_rob) ,5,5);
+
+$baza 		= 'barcod';
+$uzytkownik = 'robak';
+$haslo 		= 'robak1';
+
+
+     mysql_connect('localhost',$uzytkownik,$haslo);
+     mysql_query('SET CHARSET latin2');
+     @mysql_select_db($baza) or die("Nie można znaleć bazy danych!");
+     $kwerenda5v = "SELECT * FROM prod_got WHERE shinchang_part_no='$shinchang_part_no'";
+     $wynik5v = mysql_query($kwerenda5v);
+     $rekordow5v = mysql_numrows($wynik5v);
+     mysql_close();
+     	
+     $part_name_baza1		= mysql_result($wynik5v, $t, "part_name");						
+	 $dlugpart_name_baza1 	= strlen($part_name_baza1);
+
+
+ mysql_connect('localhost',$uzytkownik,$haslo);
+ mysql_query('SET CHARSET latin2');
+ @mysql_select_db($baza) or die("Nie można znaleć bazy danych!");
+ $kwerenda5 = "SELECT * FROM prod_st WHERE barcode='$kod'";
+ $wynik5 = mysql_query($kwerenda5);
+ $rekordow5 = mysql_numrows($wynik5);
+ mysql_close();
+ $lok_baza	 			= mysql_result($wynik5, $t, "lok");						
+ $lok_szcz	 		    = mysql_result($wynik5, $t, "lok_sc");
+ $lok_pal	 		    = mysql_result($wynik5, $t, "lok_pal"); 
+ 
+  session_start();
+  $_SESSION['sbarcode']=$kod;
+  $_SESSION['slokszcz']=$lok_szcz; 
+  $_SESSION['slokpal']=$lok_pal;
+ 
+ if($lok_baza==="MP"){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrr.php"; 
+							$komunikat = "<center><B><font size='1'><FONT COLOR='#FF0000'>PUDELKO NIE JEST PRZYJETE NA REGAL /PAPECIE<BR> ZAREJESTRUJ OPERACJE JESZCZE RAZ. 
+							              ";
+							echo "<font size='0'>$komunikat"; }
+  elseif ($lok_baza==="MG"){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrr.php"; 
+							$komunikat = "<center><B><font size='1'><FONT COLOR='#FF0000'>PUDELKO JEST JUZ NA MAGAZYNIE GLOWNYM<BR> ZAREJESTRUJ OPERACJE JESZCZE RAZ. 
+							              ";
+							echo "<font size='0'>$komunikat"; }							
+  elseif ($lok_baza==="MW"){ echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrr.php"; 
+							$komunikat = "<center><B><font size='1'><FONT COLOR='#FF0000'>PUDELKO JEST PRZYGOTOWANE DO WYSYLKI<BR> ZAREJESTRUJ OPERACJE JESZCZE RAZ. 
+							              ";
+							echo "<font size='0'>$komunikat"; }
+  
+  elseif ($lok_baza==="PR"){ 
+                                    
+					        echo include "zatw_lokrr.php";
+                            $komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'>REWORK-Zarejestruj pudelko<b> $part_no</b> na NOWEJ lokalizacji <br>
+							              </center><hr>";	
+							echo $komunikat;}
+													  						
+elseif (($lok_baza!=="PR")and($dlugpart_name_baza1>1)){ 
+                                    
+					        echo include "zatw_lokrr.php";
+                            $komunikat = "<center><B><FONT COLOR='#00aa00'><font size='1'>REWORK-Zarejestruj pudelko<b> $part_no</b> na NOWEJ lokalizacji <br>
+							              </center><hr>";   $_SESSION['sz']="Z";	
+							echo $komunikat;}
+
+ else {  echo "<font size='0'>"; echo include "aprcp_z_czytnikabbrr.php"; 
+							$komunikat = "<center><B><font size='1'><FONT COLOR='#FF0000'>WCZYTALES NIEPRAWIDŁOWY KOD KRESKOWY LUB DANE NIEZGODNE Z BAZA DANYCH<BR> ZAREJESTRUJ OPERACJE JESZCZE RAZ. 
+							              ";
+							echo "<font size='0'>$komunikat"; }
+
+							
+}							
+
+
