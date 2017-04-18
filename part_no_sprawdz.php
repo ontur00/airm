@@ -87,6 +87,7 @@ $tekst_1="Ostatnie zdarzenie / Last Event:";
 session_start();
 $login=$_SESSION['luzytkownik'];
 $kodzam=$_SESSION['s_kod_zamw'];
+//echo "<br></br> TEST!!! $kodzam";
 $dluglogin = strlen($login);
 $nazwa_klienta = ZwrocKlienta($kodzam, $baza, $uzytkownik, $haslo);
 
@@ -266,6 +267,7 @@ else
 	$qty_box1=$qty_box+12;
 	$qty_box_pr1=$qty_box_pr+18;
 	
+	//echo "<br></br>>>nr_wys_br $nr_wys_br kodzam $kodzam  lok_br $lok_br";
 	if(($nr_wys_br===$kodzam)and($lok_br==='MW'))
 	{ 
 		//echo "<br></br>>>TEM  TUTAJ9";
@@ -430,16 +432,16 @@ else
 				}
 				elseif( strlen($formalc) > strlen($alc_baza) )
 				{
-					echo "<br></br>>>TEM  TUTAJ29";
-					if(WyszukajMyslnik($formalc)!=0 and $klient =='HANIL SK' ){
-						//echo "<br></br>>>TEM TEM HANIL SKLL";
+					//echo "<br></br>>>TEM  TUTAJ29";
+					// if(WyszukajMyslnik($formalc)!=0 and $klient =='HANIL SK' ){
+					// 	//echo "<br></br>>>TEM TEM HANIL SKLL";
 						
-						$dlugosc_uciecie = strlen($formalc) - strlen($alc_baza);
-						//echo "<br></br> hanil sk dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
-						//$dlugosc_uciecie = WyszukajMyslnik($formalc);
-						$formalc = substr( $formalc , $dlugosc_uciecie, strlen($alc_baza ));
-						//echo "<br></br> hanil sk dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
-					}
+					// 	$dlugosc_uciecie = strlen($formalc) - strlen($alc_baza);
+					// 	//echo "<br></br> hanil sk dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
+					// 	//$dlugosc_uciecie = WyszukajMyslnik($formalc);
+					// 	$formalc = substr( $formalc , $dlugosc_uciecie, strlen($alc_baza ));
+					// 	//echo "<br></br> hanil sk dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
+					// }
 										
 					if(WyszukajMyslnik($formalc)!=0 and $klient !='HANIL PL' and $klient !='HANIL SK'){
 						//echo "<br></br>>>TEM TEM NIE HANIL SK i nie PL LL";
@@ -686,10 +688,26 @@ else
 			//echo "<br></br>>>TEM  TUTAJ52";
 			if( strlen($formalc) > strlen($alc_baza) )
 			{
-				//echo "<br></br>>>TEM  TUTAJ53";
-				$dlugosc_uciecie = strlen($formalc) - strlen($alc_baza);
-				$formalc = substr( $formalc , $dlugosc_uciecie, strlen($alc_baza) );
+				//echo "<br></br>>>TEM  TUTAJ53 klient $klient numerWysylki $kodzam";
+				$kodzam = strtolower($kodzam);		
+				if(WyszukajMyslnik($formalc)!=0 and $klient !='HANIL PL' and $klient !='HANIL SK' and $kodzam !='rework00'){
+						//echo "<br></br>TEM TEM NIE HANIL SK i nie PL LL";
+						//$dlugosc_uciecie = strlen($formalc) - strlen($alc_baza);
+						$dlugosc_uciecie = WyszukajMyslnik($formalc);
+						$formalc = substr( $formalc , 0, $dlugosc_uciecie );
+						//echo "<br></br> dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
+					}
+					if(WyszukajMyslnik($formalc)!=0 and ($klient =='HANIL PL' or $klient == 'HANIL SK' or $kodzam =='rework00') )
+					{
+						//echo "<br></br>>>HANIL PLLL";
+						$dlugosc_uciecie = strlen($formalc) - strlen($alc_baza);
+						//$dlugosc_uciecie = WyszukajMyslnik($formalc);
+						$formalc = substr( $formalc , $dlugosc_uciecie, strlen($alc_baza ));
+						//echo "<br></br> hanil pl dlugoscUciecia=$dlugosc_uciecie alc=".$formalc." alc_baza=".$alc_baza." klient=$klient";
+					}
 			}
+
+			
 			
 			
 			
